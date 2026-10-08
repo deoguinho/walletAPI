@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 
+	"walletAPI/internal/application/transaction"
 	"walletAPI/internal/application/wallet"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -17,7 +18,10 @@ func NewTransactionManager(db *pgxpool.Pool) *TransactionManager {
 }
 
 func (tm *TransactionManager) WithTransaction(
-	fn func(repository wallet.WalletRepository) error,
+	fn func(
+		repository wallet.WalletRepository,
+		transactionRepository transaction.TransactionRepository,
+	) error,
 ) error {
 	tx, err := tm.db.Begin(context.Background())
 	if err != nil {
@@ -27,8 +31,9 @@ func (tm *TransactionManager) WithTransaction(
 	defer tx.Rollback(context.Background())
 
 	repository := NewWalletRepository(tx)
+	transactionRepository := NewTransactionRepository(tx)
 
-	if err := fn(repository); err != nil {
+	if err := fn(repository, transactionRepository); err != nil {
 		return err
 	}
 

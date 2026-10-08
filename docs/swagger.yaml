@@ -1,0 +1,181 @@
+basePath: /
+definitions:
+  handler.CreateWalletRequest:
+    properties:
+      user_id:
+        type: integer
+    type: object
+  handler.DepositMoneyRequest:
+    properties:
+      amount:
+        type: integer
+    type: object
+  handler.TransferMoneyRequest:
+    properties:
+      amount:
+        type: integer
+      from_wallet_id:
+        type: integer
+      to_wallet_id:
+        type: integer
+    type: object
+  handler.WithdrawMoneyRequest:
+    properties:
+      amount:
+        type: integer
+    type: object
+  wallet.Wallet:
+    properties:
+      balance:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API de carteira digital desenvolvida em Go.
+  title: Wallet API
+  version: "1.0"
+paths:
+  /wallets:
+    post:
+      consumes:
+      - application/json
+      description: Cria uma nova carteira associada a um usuário
+      parameters:
+      - description: Dados da carteira
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateWalletRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/wallet.Wallet'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cria uma nova carteira
+      tags:
+      - Wallet
+  /wallets/{id}/deposit:
+    post:
+      consumes:
+      - application/json
+      description: Adiciona saldo à carteira informada
+      parameters:
+      - description: ID da carteira
+        format: int64
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados do depósito
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.DepositMoneyRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Realiza um depósito
+      tags:
+      - Wallet
+  /wallets/{id}/withdraw:
+    post:
+      consumes:
+      - application/json
+      description: Retira saldo da carteira informada
+      parameters:
+      - description: ID da carteira
+        format: int64
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados do saque
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.WithdrawMoneyRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Realiza um saque
+      tags:
+      - Wallet
+  /wallets/transfer:
+    post:
+      consumes:
+      - application/json
+      description: Transfere saldo de uma carteira para outra
+      parameters:
+      - description: Dados da transferência
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.TransferMoneyRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Realiza uma transferência
+      tags:
+      - Transaction
+swagger: "2.0"

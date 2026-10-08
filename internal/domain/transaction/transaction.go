@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -28,6 +29,19 @@ type Transaction struct {
 	Type         TransactionType   `json:"type"`
 	Status       TransactionStatus `json:"status"`
 	CreatedAt    time.Time         `json:"created_at"`
+}
+
+func NewTransaction(fromWalletID int64, toWalletID int64, amount int64, Type string, status string) *Transaction {
+	fromWalletIDString := strconv.FormatInt(fromWalletID, 10)
+	toWalletIDString := strconv.FormatInt(toWalletID, 10)
+
+	return &Transaction{
+		FromWalletID: &fromWalletIDString,
+		ToWalletID:   &toWalletIDString,
+		Amount:       amount,
+		Type:         TransactionType(Type),
+		Status:       TransactionStatus(status),
+	}
 }
 
 func (t *Transaction) Validate() error {

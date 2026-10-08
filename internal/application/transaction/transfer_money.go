@@ -2,20 +2,26 @@ package transaction
 
 import (
 	"errors"
+	"strconv"
 	"walletAPI/internal/application/wallet"
+	"walletAPI/internal/domain/transaction"
 )
 
 type TransferMoney struct {
-	repository         wallet.WalletRepository
-	transactionManager TransactionManager
+	repository            wallet.WalletRepository
+	transactionManager    TransactionManager
+	transactionRepository TransactionRepository
 }
 
 func NewTransferMoney(
+
 	repository wallet.WalletRepository,
-	transactionManager TransactionManager) *TransferMoney {
+	transactionManager TransactionManager,
+	transactionRepository TransactionRepository) *TransferMoney {
 	return &TransferMoney{
-		repository:         repository,
-		transactionManager: transactionManager,
+		repository:            repository,
+		transactionManager:    transactionManager,
+		transactionRepository: transactionRepository,
 	}
 }
 
@@ -24,7 +30,7 @@ func (tm *TransferMoney) Execute(fromWalletID int64, toWalletID int64, amount in
 		return errors.New("cannot transfer to the same wallet")
 	}
 
-	return tm.transactionManager.WithTransaction(func(repository wallet.WalletRepository) error {
+	return tm.transactionManager.WithTransaction(func(repository wallet.WalletRepository, transactionRepository TransactionRepository) error {
 
 		fromWallet, err := repository.GetByID(fromWalletID)
 		if err != nil {
@@ -56,6 +62,21 @@ func (tm *TransferMoney) Execute(fromWalletID int64, toWalletID int64, amount in
 			return err
 		}
 
+		fromWalletIDString := strconv.FormatInt(fromWalletID, 10)
+		toWalletIDString := strconv.FormatInt(toWalletID, 10)
+		tx := &transaction.Transaction{
+			FromWalletID: &fromWalletIDString,
+			ToWalletID:   &toWalletIDString,
+			Amount:       amount,
+			Type:         transaction.TransferTransaction,
+			Status:       transaction.CompletedStatus,
+		}
+
+		err = transactionRepository.Create(tx)
+		if err != nil {
+			return err
+		}
 		return nil
 	})
+
 }

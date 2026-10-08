@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+const startBalance = 0
+
 var ErrWalletNotFound = errors.New("wallet not found")
 
 type Wallet struct {
@@ -17,7 +19,7 @@ type Wallet struct {
 func NewWallet(userID int64, balance int64) *Wallet {
 	return &Wallet{
 		UserID:  userID,
-		Balance: 0,
+		Balance: startBalance,
 	}
 }
 

@@ -46,6 +46,16 @@ func NewWalletHandler(
 	}
 }
 
+// CreateWallet godoc
+// @Summary Cria uma nova carteira
+// @Description Cria uma nova carteira associada a um usuário
+// @Tags Wallet
+// @Accept json
+// @Produce json
+// @Param request body CreateWalletRequest true "Dados da carteira"
+// @Success 201 {object} wallet.Wallet
+// @Failure 400 {object} map[string]string
+// @Router /wallets [post]
 func (h *WalletHandler) CreateWallet(w http.ResponseWriter, r *http.Request) {
 	var req CreateWalletRequest
 
@@ -64,6 +74,18 @@ func (h *WalletHandler) CreateWallet(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(wallet)
 }
 
+// DepositMoney godoc
+// @Summary Realiza um depósito
+// @Description Adiciona saldo à carteira informada
+// @Tags Wallet
+// @Accept json
+// @Produce json
+// @Param id path int64 true "ID da carteira"
+// @Param request body DepositMoneyRequest true "Dados do depósito"
+// @Success 204
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /wallets/{id}/deposit [post]
 func (h *WalletHandler) DepositMoney(w http.ResponseWriter, r *http.Request) {
 
 	id := r.PathValue("id")
@@ -85,6 +107,18 @@ func (h *WalletHandler) DepositMoney(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// WithdrawMoney godoc
+// @Summary Realiza um saque
+// @Description Retira saldo da carteira informada
+// @Tags Wallet
+// @Accept json
+// @Produce json
+// @Param id path int64 true "ID da carteira"
+// @Param request body WithdrawMoneyRequest true "Dados do saque"
+// @Success 204
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /wallets/{id}/withdraw [post]
 func (h *WalletHandler) WithdrawMoney(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	walletID, err := strconv.ParseInt(id, 10, 64)
@@ -105,6 +139,17 @@ func (h *WalletHandler) WithdrawMoney(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// TransferMoney godoc
+// @Summary Realiza uma transferência
+// @Description Transfere saldo de uma carteira para outra
+// @Tags Transaction
+// @Accept json
+// @Produce json
+// @Param request body TransferMoneyRequest true "Dados da transferência"
+// @Success 204
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /wallets/transfer [post]
 func (h *WalletHandler) TransferMoney(w http.ResponseWriter, r *http.Request) {
 	var req TransferMoneyRequest
 
