@@ -1,5 +1,7 @@
 package wallet
 
+type DBTX interface{}
+
 type TransactionManager interface {
-	withTransaction(func() error) error
+	WithTransaction(fn func(repository WalletRepository) error) error
 }

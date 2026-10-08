@@ -5,11 +5,20 @@ import (
 	"time"
 )
 
+var ErrWalletNotFound = errors.New("wallet not found")
+
 type Wallet struct {
-	ID        string    `json:"id"`
-	UserID    string    `json:"user_id"`
+	ID        int64     `json:"id"`
+	UserID    int64     `json:"user_id"`
 	Balance   int64     `json:"balance"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+func NewWallet(userID int64, balance int64) *Wallet {
+	return &Wallet{
+		UserID:  userID,
+		Balance: 0,
+	}
 }
 
 // Deposito
