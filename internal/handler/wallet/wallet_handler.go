@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"walletAPI/internal/application/transaction"
 	"walletAPI/internal/application/wallet"
 )
 
@@ -11,7 +12,7 @@ type WalletHandler struct {
 	createWallet  *wallet.CreateWallet
 	depositMoney  *wallet.DepositMoneyRequest
 	withdrawMoney *wallet.WithdrawMoney
-	transferMoney *wallet.TransferMoney
+	transferMoney *transaction.TransferMoney
 }
 
 type CreateWalletRequest struct {
@@ -36,7 +37,7 @@ func NewWalletHandler(
 	createWallet *wallet.CreateWallet,
 	depositMoney *wallet.DepositMoneyRequest,
 	withdrawMoney *wallet.WithdrawMoney,
-	transferMoney *wallet.TransferMoney) *WalletHandler {
+	transferMoney *transaction.TransferMoney) *WalletHandler {
 	return &WalletHandler{
 		createWallet:  createWallet,
 		depositMoney:  depositMoney,
@@ -49,13 +50,14 @@ func (h *WalletHandler) CreateWallet(w http.ResponseWriter, r *http.Request) {
 	var req CreateWalletRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		Error(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	wallet, err := h.createWallet.Execute(req.UserID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		Error(w, http.StatusBadRequest, err.Error())
+
 		return
 	}
 
@@ -70,13 +72,13 @@ func (h *WalletHandler) DepositMoney(w http.ResponseWriter, r *http.Request) {
 	var req DepositMoneyRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		Error(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	err = h.depositMoney.Execute(walletID, req.Amount)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		Error(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -90,13 +92,13 @@ func (h *WalletHandler) WithdrawMoney(w http.ResponseWriter, r *http.Request) {
 	var req DepositMoneyRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		Error(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	err = h.withdrawMoney.Execute(walletID, req.Amount)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		Error(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -107,7 +109,7 @@ func (h *WalletHandler) TransferMoney(w http.ResponseWriter, r *http.Request) {
 	var req TransferMoneyRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		Error(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -117,7 +119,7 @@ func (h *WalletHandler) TransferMoney(w http.ResponseWriter, r *http.Request) {
 		req.Amount,
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		Error(w, http.StatusBadRequest, err.Error())
 		return
 	}
 

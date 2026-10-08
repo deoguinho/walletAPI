@@ -1,14 +1,17 @@
-package wallet
+package transaction
 
-import "errors"
+import (
+	"errors"
+	"walletAPI/internal/application/wallet"
+)
 
 type TransferMoney struct {
-	repository         WalletRepository
+	repository         wallet.WalletRepository
 	transactionManager TransactionManager
 }
 
 func NewTransferMoney(
-	repository WalletRepository,
+	repository wallet.WalletRepository,
 	transactionManager TransactionManager) *TransferMoney {
 	return &TransferMoney{
 		repository:         repository,
@@ -21,7 +24,7 @@ func (tm *TransferMoney) Execute(fromWalletID int64, toWalletID int64, amount in
 		return errors.New("cannot transfer to the same wallet")
 	}
 
-	return tm.transactionManager.WithTransaction(func(repository WalletRepository) error {
+	return tm.transactionManager.WithTransaction(func(repository wallet.WalletRepository) error {
 
 		fromWallet, err := repository.GetByID(fromWalletID)
 		if err != nil {
